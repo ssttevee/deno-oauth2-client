@@ -17,6 +17,8 @@ export interface GetUriOptions {
    * https://tools.ietf.org/html/rfc6749#section-3.3
    */
   scope?: string | string[];
+  /** The URI of the client's redirection endpoint (sometimes also called callback URI). */
+  redirectUri?: string;
 }
 
 export interface GetTokenOptions {
@@ -35,6 +37,8 @@ export interface GetTokenOptions {
    * The option object's state value is ignored when a stateValidator is passed.
    */
   stateValidator?: (state: string | null) => boolean;
+  /** The URI of the client's redirection endpoint (sometimes also called callback URI). */
+  redirectUri?: string;
   /** Request options used when making the access token request. */
   requestOptions?: RequestOptions;
 }
@@ -54,8 +58,9 @@ export class AuthorizationCodeGrant extends OAuth2GrantBase {
     const params = new URLSearchParams();
     params.set("response_type", "code");
     params.set("client_id", this.client.config.clientId);
-    if (typeof this.client.config.redirectUri === "string") {
-      params.set("redirect_uri", this.client.config.redirectUri);
+    const redirectUri = options.redirectUri ?? this.client.config.redirectUri;
+    if (typeof redirectUri === "string") {
+      params.set("redirect_uri", redirectUri);
     }
     const scope = options.scope ?? this.client.config.defaults?.scope;
     if (scope) {
@@ -97,8 +102,9 @@ export class AuthorizationCodeGrant extends OAuth2GrantBase {
     url: URL,
     options: GetTokenOptions,
   ): { code: string; state?: string } {
-    if (typeof this.client.config.redirectUri === "string") {
-      const expectedUrl = new URL(this.client.config.redirectUri);
+    const redirectUri = options.redirectUri ?? this.client.config.redirectUri;
+    if (typeof redirectUri === "string") {
+      const expectedUrl = new URL(redirectUri);
 
       if (
         typeof url.pathname === "string" &&
@@ -162,8 +168,9 @@ export class AuthorizationCodeGrant extends OAuth2GrantBase {
       "Accept": "application/json",
     };
 
-    if (typeof this.client.config.redirectUri === "string") {
-      body.redirect_uri = this.client.config.redirectUri;
+    const redirectUri = options.redirectUri ?? this.client.config.redirectUri;
+    if (typeof redirectUri === "string") {
+      body.redirect_uri = redirectUri;
     }
 
     if (typeof this.client.config.clientSecret === "string") {
