@@ -102,9 +102,8 @@ export class AuthorizationCodeGrant extends OAuth2GrantBase {
     url: URL,
     options: GetTokenOptions,
   ): { code: string; state?: string } {
-    const redirectUri = options.redirectUri ?? this.client.config.redirectUri;
-    if (typeof redirectUri === "string") {
-      const expectedUrl = new URL(redirectUri);
+    if (typeof this.client.config.redirectUri === "string") {
+      const expectedUrl = new URL(this.client.config.redirectUri);
 
       if (
         typeof url.pathname === "string" &&
@@ -168,9 +167,8 @@ export class AuthorizationCodeGrant extends OAuth2GrantBase {
       "Accept": "application/json",
     };
 
-    const redirectUri = options.redirectUri ?? this.client.config.redirectUri;
-    if (typeof redirectUri === "string") {
-      body.redirect_uri = redirectUri;
+    if (typeof this.client.config.redirectUri === "string") {
+      body.redirect_uri = this.client.config.redirectUri;
     }
 
     if (typeof this.client.config.clientSecret === "string") {
